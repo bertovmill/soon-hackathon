@@ -3,13 +3,24 @@ import OpenAI from "openai";
 const openai = new OpenAI();
 
 export async function POST(request: Request) {
-  const { idea } = await request.json();
+  const { idea, brandAnalysis, companyName } = await request.json();
 
   if (!idea || typeof idea !== "string") {
     return Response.json({ error: "Missing 'idea' field" }, { status: 400 });
   }
 
-  const prompt = `Product concept visualization: ${idea}. Professional product design render, clean background, modern aesthetic, high quality concept art.`;
+  let prompt = `Product concept visualization: ${idea}.`;
+
+  if (brandAnalysis && companyName) {
+    prompt = `Product concept visualization for ${companyName}: ${idea}.
+Brand colors: ${brandAnalysis.colorPalette?.join(", ") || "modern palette"}.
+Design style: ${brandAnalysis.designStyle || "clean and modern"}.
+Brand personality: ${brandAnalysis.brandPersonality || "professional"}.
+The product should feel authentic to the ${companyName} brand.
+Professional product design render, studio lighting, high quality concept art.`;
+  } else {
+    prompt += ` Professional product design render, clean background, modern aesthetic, high quality concept art.`;
+  }
 
   console.log("[generate-image] Received idea:", idea);
   console.log("[generate-image] Sending prompt to gpt-image-2...");
