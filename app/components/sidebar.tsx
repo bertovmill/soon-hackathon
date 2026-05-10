@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useState } from "react";
 
 const navItems = [
   { name: "Dashboard", href: "/", icon: LayoutDashboardIcon },
@@ -12,32 +13,59 @@ const navItems = [
 
 export default function Sidebar() {
   const pathname = usePathname();
+  const [collapsed, setCollapsed] = useState(false);
 
   return (
-    <aside className="flex h-full w-64 flex-col border-r border-neutral-200 bg-neutral-50 dark:border-neutral-800 dark:bg-neutral-900">
-      <div className="flex h-14 items-center border-b border-neutral-200 px-6 dark:border-neutral-800">
-        <span className="text-lg font-semibold">Aucctus</span>
+    <aside
+      className={`flex h-full flex-col border-r border-neutral-200 bg-neutral-50 transition-all duration-200 dark:border-neutral-800 dark:bg-neutral-900 ${
+        collapsed ? "w-16" : "w-64"
+      }`}
+    >
+      <div className="flex h-14 items-center justify-between border-b border-neutral-200 px-3 dark:border-neutral-800">
+        {!collapsed && <span className="px-3 text-lg font-semibold">Aucctus</span>}
+        <button
+          onClick={() => setCollapsed(!collapsed)}
+          className="rounded-lg p-2 text-neutral-500 hover:bg-neutral-100 hover:text-neutral-900 dark:hover:bg-neutral-800 dark:hover:text-neutral-100"
+          title={collapsed ? "Expand sidebar" : "Collapse sidebar"}
+        >
+          <ChevronIcon className="h-5 w-5" direction={collapsed ? "right" : "left"} />
+        </button>
       </div>
-      <nav className="flex-1 space-y-1 p-4">
+      <nav className="flex-1 space-y-1 p-2">
         {navItems.map((item) => {
           const isActive = pathname === item.href;
           return (
             <Link
               key={item.name}
               href={item.href}
+              title={collapsed ? item.name : undefined}
               className={`flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors ${
+                collapsed ? "justify-center" : ""
+              } ${
                 isActive
                   ? "bg-neutral-200 text-neutral-900 dark:bg-neutral-800 dark:text-neutral-100"
                   : "text-neutral-600 hover:bg-neutral-100 hover:text-neutral-900 dark:text-neutral-400 dark:hover:bg-neutral-800 dark:hover:text-neutral-100"
               }`}
             >
-              <item.icon className="h-5 w-5" />
-              {item.name}
+              <item.icon className="h-5 w-5 shrink-0" />
+              {!collapsed && item.name}
             </Link>
           );
         })}
       </nav>
     </aside>
+  );
+}
+
+function ChevronIcon({ className, direction }: { className?: string; direction: "left" | "right" }) {
+  return (
+    <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={1.5}>
+      {direction === "left" ? (
+        <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 19.5 8.25 12l7.5-7.5" />
+      ) : (
+        <path strokeLinecap="round" strokeLinejoin="round" d="m8.25 4.5 7.5 7.5-7.5 7.5" />
+      )}
+    </svg>
   );
 }
 
