@@ -25,7 +25,7 @@ export async function POST(request: Request) {
     });
     const elapsed = ((Date.now() - startTime) / 1000).toFixed(1);
 
-    const imageBase64 = response.data[0].b64_json;
+    const imageBase64 = response.data?.[0]?.b64_json;
     console.log(`[generate-image] Success in ${elapsed}s, image size: ${imageBase64?.length ?? 0} chars base64`);
 
     return Response.json({
